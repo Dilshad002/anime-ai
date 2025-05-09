@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    :root {
+  --primary-color: #6e48aa;
+  --secondary-color: #9d50bb;
+  --sidebar-bg: #1a1a2e;
+  --chat-bg: #f8f9fa;
+  --message-ai-bg: #ffffff;
+  --message-user-bg: #f0f0f5;
+  --text-color: #333333;
+  --text-light: #666666;
+  --border-color: #e1e1e1;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--chat-bg);
+  color: var(--text-color);
+  height: 100vh;
+  display: flex;
+}
+
+.app-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 260px;
+  background-color: var(--sidebar-bg);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.logo i {
+  font-size: 24px;
+  color: var(--primary-color);
+}
+
+.logo span {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.new-chat-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.new-chat-btn:hover {
+  opacity: 0.9;
+}
+
+.chat-history-container {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.history-item {
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.history-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.history-item.active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.history-item i {
+  font-size: 14px;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: auto;
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  background-color: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Main Content Styles */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-container {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.welcome-message {
+  text-align: center;
+  margin: auto;
+  max-width: 600px;
+  padding: 20px;
+}
+
+.welcome-message h1 {
+  font-size: 32px;
+  margin-bottom: 15px;
+  color: var(--primary-color);
+}
+
+.welcome-message p {
+  font-size: 16px;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.message {
+  display: flex;
+  gap: 15px;
+  padding: 15px 0;
+}
+
+.message-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.message-content {
+  flex: 1;
+}
+
+.message-role {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.message-text {
+  line-height: 1.6;
+}
+
+/* Input Area Styles */
+.input-container {
+  padding: 15px;
+  background-color: white;
+  border-top: 1px solid var(--border-color);
+  position: relative;
+}
+
+.input-box {
+  display: flex;
+  align-items: flex-end;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 12px;
+  background-color: white;
+}
+
+#userInput {
+  flex: 1;
+  border: none;
+  resize: none;
+  outline: none;
+  font-size: 16px;
+  line-height: 1.5;
+  max-height: 200px;
+  min-height: 24px;
+  padding: 5px 0;
+}
+
+.send-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: background-color 0.3s;
+}
+
+.send-button:hover {
+  background-color: var(--secondary-color);
+}
+
+.disclaimer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 10px;
+}
+
+/* Predictions Styles */
+.predictions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.prediction-btn {
+  padding: 6px 12px;
+  background-color: #eef2ff;
+  color: var(--primary-color);
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.3s;
+  position: relative;
+  border: 1px solid #d6d9f0;
+}
+
+.prediction-btn:hover {
+  background-color: #e0e5ff;
+}
+
+.probability {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 70px;
+    padding: 10px 5px;
+  }
+  
+  .logo span, .new-chat-btn span, .history-item span, .username {
+    display: none;
+  }
+  
+  .logo, .new-chat-btn, .history-item {
+    justify-content: center;
+  }
+}
+</style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anime AI Assistant</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar">
+      <div class="logo">
+        <i class="fas fa-robot"></i>
+        <span>AnimeAI</span>
+      </div>
+      <button class="new-chat-btn">
+        <i class="fas fa-plus"></i>
+        <span>New Chat</span>
+      </button>
+      <div class="chat-history-container">
+        <div class="history-item active">
+          <i class="fas fa-comment"></i>
+          <span>Current Chat</span>
+        </div>
+        <div class="history-item">
+          <i class="fas fa-comment"></i>
+          <span>Anime Recommendations</span>
+        </div>
+      </div>
+      <div class="user-section">
+        <div class="user-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <span class="username">Anime Fan</span>
+      </div>
+    </div>
+    
+    <div class="main-content">
+      <div class="chat-container" id="chatContainer">
+        <div class="welcome-message">
+          <h1>Anime AI Assistant</h1>
+          <p>Ask me anything about anime - recommendations, character info, studio details, or anime terminology!</p>
+        </div>
+        <div class="messages" id="chatHistory"></div>
+      </div>
+      
+      <div class="input-container">
+        <div class="predictions" id="predictions"></div>
+        <div class="input-box">
+          <textarea id="userInput" placeholder="Ask me anything about anime..." rows="1"></textarea>
+          <button class="send-button" id="generateBtn">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+        <div class="disclaimer">
+          Anime AI Assistant may produce inaccurate information about anime characters, shows, or studios.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+<script>
+    // Enhanced word prediction model with probability scores
+const wordPredictions = {
+    "what": { "is": 0.6, "are": 0.3, "was": 0.08, "would": 0.02 },
+    "who": { "is": 0.7, "are": 0.2, "was": 0.07, "were": 0.03 },
+    "recommend": { "me": 0.8, "some": 0.1, "a": 0.07, "an": 0.03 },
+    "best": { "anime": 0.5, "character": 0.3, "studio": 0.15, "fight": 0.05 },
+    "i": { "love": 0.6, "like": 0.2, "hate": 0.15, "prefer": 0.05 },
+    "the": { "best": 0.4, "most": 0.3, "worst": 0.2, "popular": 0.1 },
+    "studio": { "ghibli": 0.7, "mappa": 0.2, "ufotable": 0.1 },
+    "character": { "development": 0.8, "design": 0.15, "arc": 0.05 },
+    "anime": { "series": 0.7, "movie": 0.2, "episode": 0.1 },
+    "why": { "is": 0.9, "does": 0.05, "are": 0.05 },
+    "when": { "did": 0.8, "will": 0.1, "was": 0.1 },
+    "how": { "many": 0.9, "long": 0.05, "much": 0.05 },
+    "explain": { "the": 0.9, "this": 0.1 },
+    "difference": { "between": 0.9, "in": 0.1 },
+    "between": { "naruto": 0.6, "one": 0.3, "attack": 0.1 },
+    "naruto": { "and": 0.9, "vs": 0.1 },
+    "demon": { "slayer": 0.9, "hunter": 0.1 },
+    "attack": { "on": 0.9, "against": 0.1 },
+    "on": { "titan": 0.9, "netflix": 0.1 },
+    "death": { "note": 0.9, "parade": 0.1 }
+};
+
+// Common anime words fallback with probabilities
+const commonWords = {
+    "anime": 0.2,
+    "character": 0.15,
+    "series": 0.1,
+    "episode": 0.1,
+    "studio": 0.1,
+    "recommend": 0.15,
+    "best": 0.1,
+    "favorite": 0.1
+};
+
+// DOM elements
+const userInput = document.getElementById('userInput');
+const predictionsDiv = document.getElementById('predictions');
+const generateBtn = document.getElementById('generateBtn');
+const chatHistory = document.getElementById('chatHistory');
+const chatContainer = document.getElementById('chatContainer');
+
+// Event listeners
+userInput.addEventListener('input', updatePredictions);
+generateBtn.addEventListener('click', sendMessage);
+userInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+
+// Auto-resize textarea
+userInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+});
+
+function updatePredictions() {
+    const text = userInput.value.trim();
+    const words = text.split(/\s+/);
+    const lastWord = words[words.length - 1].toLowerCase();
+
+    // Clear previous predictions
+    predictionsDiv.innerHTML = '';
+
+    // Get predictions for the last word
+    let predictions = [];
+    
+    if (wordPredictions[lastWord]) {
+        predictions = Object.entries(wordPredictions[lastWord])
+            .map(([word, prob]) => ({ word, prob }))
+            .sort((a, b) => b.prob - a.prob);
+    } else if (text.length > 0) {
+        predictions = Object.entries(commonWords)
+            .map(([word, prob]) => ({ word, prob }))
+            .sort((a, b) => b.prob - a.prob);
+    }
+
+    // Create prediction buttons
+    predictions.slice(0, 5).forEach(({word, prob}) => {
+        const button = document.createElement('button');
+        button.className = 'prediction-btn';
+        button.textContent = word;
+        
+        const probBadge = document.createElement('span');
+        probBadge.className = 'probability';
+        probBadge.textContent = Math.round(prob * 100);
+        button.appendChild(probBadge);
+        
+        button.addEventListener('click', () => {
+            if (text.length === 0 || userInput.value.endsWith(' ')) {
+                userInput.value += word + ' ';
+            } else {
+                userInput.value += ' ' + word + ' ';
+            }
+            userInput.focus();
+            updatePredictions();
+            userInput.style.height = 'auto';
+            userInput.style.height = (userInput.scrollHeight) + 'px';
+        });
+        
+        predictionsDiv.appendChild(button);
+    });
+}
+
+function sendMessage() {
+    const message = userInput.value.trim();
+    if (message === '') return;
+
+    // Hide welcome message if it's the first user message
+    const welcomeMessage = document.querySelector('.welcome-message');
+    if (welcomeMessage) {
+        welcomeMessage.style.display = 'none';
+    }
+
+    // Add user message to chat
+    addMessage('user', message);
+
+    // Clear input and predictions
+    userInput.value = '';
+    predictionsDiv.innerHTML = '';
+    userInput.style.height = 'auto';
+
+    // Simulate AI typing indicator
+    const typingIndicator = addMessage('ai', '', true);
+    
+    // Simulate AI response after delay
+    setTimeout(() => {
+        chatHistory.removeChild(typingIndicator);
+        const aiResponse = getAIResponse(message);
+        addMessage('ai', aiResponse);
+    }, 1000 + Math.random() * 1000);
+}
+
+function addMessage(role, content, isTyping = false) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${role}-message`;
+    
+    const avatarDiv = document.createElement('div');
+    avatarDiv.className = 'message-avatar';
+    avatarDiv.innerHTML = role === 'ai' ? '<i class="fas fa-robot"></i>' : '<i class="fas fa-user"></i>';
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    
+    const roleDiv = document.createElement('div');
+    roleDiv.className = 'message-role';
+    roleDiv.textContent = role === 'ai' ? 'Anime AI' : 'You';
+    
+    const textDiv = document.createElement('div');
+    textDiv.className = 'message-text';
+    
+    if (isTyping) {
+        textDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+        messageDiv.id = 'typing-indicator';
+    } else {
+        textDiv.textContent = content;
+    }
+    
+    contentDiv.appendChild(roleDiv);
+    contentDiv.appendChild(textDiv);
+    
+    messageDiv.appendChild(avatarDiv);
+    messageDiv.appendChild(contentDiv);
+    
+    chatHistory.appendChild(messageDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    
+    return messageDiv;
+}
+
+function getAIResponse(message) {
+    // Simple response logic - in a real app, you'd connect to an AI service
+    const lowerMessage = message.toLowerCase();
+    
+    if (lowerMessage.includes('recommend') || lowerMessage.includes('suggest')) {
+        const recommendations = [
+            "For action: Attack on Titan, Demon Slayer, Jujutsu Kaisen",
+            "For romance: Your Name, Toradora, Fruits Basket",
+            "For psychological: Death Note, Psycho-Pass, Monster",
+            "For isekai: Re:Zero, Mushoku Tensei, That Time I Got Reincarnated as a Slime"
+        ];
+        return "Here are some recommendations based on different genres:\n\n" + 
+               recommendations.join("\n\n");
+    } else if (lowerMessage.includes('character') && 
+              (lowerMessage.includes('best') || lowerMessage.includes('favorite'))) {
+        return "Some iconic anime characters include:\n- Goku (Dragon Ball)\n- Luffy (One Piece)\n" + 
+               "- Levi (Attack on Titan)\n- Light Yagami (Death Note)\n- Nezuko (Demon Slayer)";
+    } else if (lowerMessage.includes('studio') || lowerMessage.includes('production')) {
+        return "Major anime studios and their famous works:\n\n" +
+               "• Studio Ghibli: Spirited Away, My Neighbor Totoro\n" +
+               "• MAPPA: Jujutsu Kaisen, Attack on Titan Final Season\n" +
+               "• Ufotable: Demon Slayer, Fate series\n" +
+               "• Bones: My Hero Academia, Fullmetal Alchemist: Brotherhood";
+    } else if (lowerMessage.includes('difference') && lowerMessage.includes('between')) {
+        return "Popular anime comparisons:\n\n" +
+               "Naruto vs. One Piece: Both are long-running shonen, but One Piece focuses more on adventure " +
+               "while Naruto has more personal character development.\n\n" +
+               "Attack on Titan vs. Demon Slayer: Both feature human vs. monster conflicts, but AoT is darker " +
+               "with more complex themes while Demon Slayer has more traditional shonen elements.";
+    } else {
+        const genericResponses = [
+            "That's an interesting question about anime! I'd be happy to discuss this with you.",
+            "Anime has so many fascinating aspects to explore. Could you clarify your question?",
+            "I love talking about anime! There are many perspectives on this topic.",
+            "The anime community has diverse opinions about this. Here's what I know..."
+        ];
+        return genericResponses[Math.floor(Math.random() * genericResponses.length)];
+    }
+}
+</script>
+</html>
